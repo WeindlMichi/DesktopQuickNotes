@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,9 +16,17 @@ using System.Windows.Navigation;
 
 namespace DesktopQuickNotes
 {
+    public class NoteData
+    {
+        public string Text { get; set;  }
+        public double Width { get; set; } = 350;
+        public double Height { get; set; } = 300;
+        public double X { get; set; } = 100;
+        public double Y { get; set; } = 100;
+    }
     public partial class MainWindow : Window
     {
-        string saveFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DesktopQuickNotes.txt");
+        string saveFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DesktopQuickNotes.json");
 
         public MainWindow()
         {
@@ -27,28 +35,65 @@ namespace DesktopQuickNotes
             LoadNotes();
 
             NotesBox.TextChanged += NotesBox_TextChanged;
+            this.SizeChanged += MainWindow_SizeChanged;
+            this.LocationChanged += MainWindow_LocationChanged;
         }
 
-        private void NotesBox_TextChanged(
-            object sender,
-            TextChangedEventArgs e)
+        private void NotesBox_TextChanged( object sender, TextChangedEventArgs e)
         {
+            SaveNotes();
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Window size changed! \n new width: {this.ActualWidth} \n new height: {this.ActualHeight}");
+            SaveNotes();
+        }
+
+        private void MainWindow_LocationChanged(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Window pos changed! \n new x: {this.Left} \n new y: {this.Top}");
             SaveNotes();
         }
 
         private void SaveNotes()
         {
-            File.WriteAllText(
-                saveFile,
-                NotesBox.Text);
+            var data = new NoteData
+            {
+                Text = NotesBox.Text,
+                Width = this.ActualWidth,
+                Height = this.ActualHeight,
+                X = this.Left,
+                Y = this.Top
+            };
+
+            string jsonString = JsonSerializer.Serialize(data);
+
+            File.WriteAllText(saveFile, jsonString);
         }
 
         private void LoadNotes()
         {
             if (File.Exists(saveFile))
             {
-                NotesBox.Text =
-                    File.ReadAllText(saveFile);
+                try
+                {
+                    string jsonString = File.ReadAllText(saveFile);
+                    var data = JsonSerializer.Deserialize<NoteData>(jsonString);
+
+                    if(data != null)
+                    {
+                        NotesBox.Text = data.Text;
+                        this.Width = data.Width;
+                        this.Height = data.Height;
+                        this.Left = data.X;
+                        this.Top = data.Y;
+                    }
+                }
+                catch
+                {
+                    // use default value
+                }
             }
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -71,8 +116,6 @@ namespace DesktopQuickNotes
             Point mousePosition = e.GetPosition(NotesBox);
 
             int caretIndex = NotesBox.GetCharacterIndexFromPoint(mousePosition, true);
-
-            System.Diagnostics.Debug.WriteLine($"caretIndex: {caretIndex}");
 
             if (caretIndex >= 0)
             {
