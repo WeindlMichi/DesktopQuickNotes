@@ -11,8 +11,9 @@
         Topmost="True"
         
         ShowInTaskbar="False"
-        MouseDown="Window_MouseDown">
-
+        MouseDown="Window_MouseDown"
+        PreviewMouseRightButtonUp="NoteBox_PreviewMouseRightButtonUp">
+    
     <Grid>
         <Border
             Background="#80000000"
@@ -67,5 +68,31 @@
                 </Style>
             </Button.Style>
         </Button>
+
+        <Popup Name="SettingsPopUp"
+               StaysOpen="False"
+               Placement="Center"
+               PlacementTarget="{Binding ElementName=NotesBox}"
+               AllowsTransparency="True">
+
+            <Border Background="#F0202020"
+                    BorderBrush="#40FFFFFF"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="15"
+                    Width="200">
+
+                <StackPanel>
+                    <TextBlock Text="Schriftgröße:" Foreground="White" Margin="0,0,0,5"/>
+
+                    <ComboBox Name="FontSizeComboBox" Margin="0,0,0,10" SelectionChanged="FontSizeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="12"/>
+                        <ComboBoxItem Content="14"/>
+                        <ComboBoxItem Content="16"/>
+                        <ComboBoxItem Content="18"/>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+        </Popup>
     </Grid>
 </Window>

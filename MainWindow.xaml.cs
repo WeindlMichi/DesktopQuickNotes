@@ -23,6 +23,7 @@ namespace DesktopQuickNotes
         public double Height { get; set; } = 300;
         public double X { get; set; } = 100;
         public double Y { get; set; } = 100;
+        public double FontSize { get; set; } = 14;
     }
     public partial class MainWindow : Window
     {
@@ -55,6 +56,16 @@ namespace DesktopQuickNotes
             System.Diagnostics.Debug.WriteLine($"Window pos changed! \n new x: {this.Left} \n new y: {this.Top}");
             SaveNotes();
         }
+        
+        private void FontSizeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (FontSizeComboBox.SelectedItem is ComboBoxItem item)
+            {
+                double newSize = Convert.ToDouble(item.Content);
+                NotesBox.FontSize = newSize;
+                SaveNotes();
+            }
+        }
 
         private void SaveNotes()
         {
@@ -64,7 +75,8 @@ namespace DesktopQuickNotes
                 Width = this.ActualWidth,
                 Height = this.ActualHeight,
                 X = this.Left,
-                Y = this.Top
+                Y = this.Top,
+                FontSize = NotesBox.FontSize
             };
 
             string jsonString = JsonSerializer.Serialize(data);
@@ -88,6 +100,7 @@ namespace DesktopQuickNotes
                         this.Height = data.Height;
                         this.Left = data.X;
                         this.Top = data.Y;
+                        NotesBox.FontSize = data.FontSize;
                     }
                 }
                 catch
@@ -131,6 +144,15 @@ namespace DesktopQuickNotes
                     NotesBox.Select(lineStart, lineLength);
                 }
             }
+        }
+
+        private void NoteBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+
+            FontSizeComboBox.Text = NotesBox.FontSize.ToString();
+
+            SettingsPopUp.IsOpen = true;
         }
     }
 }
