@@ -1,0 +1,34 @@
+﻿<Window x:Class="DesktopQuickNotes.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quick Notes"
+        Height="300"
+        Width="350"
+
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        AllowsTransparency="True"
+        Background="Transparent"
+
+        Topmost="True"
+        
+        ShowInTaskbar="False"
+        MouseDown="Window_MouseDown">
+
+    <Border
+        Background="#80000000"
+        CornerRadius="12"
+        Padding="10">
+
+        <TextBox
+            Name="NotesBox"
+            Background="Transparent"
+            Foreground="White"
+            BorderThickness="0"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            FontSize="14"/>
+
+    </Border>
+
+</Window>
